@@ -29,15 +29,29 @@
 		<th width="165">Name</th>
 		<th width="90">Need Photo</th>
 		<th width="90">Need Bio</th>
-		<th width="30"><img src="/images/check" width="24" height="24" title="Good to go!"/></th>
+		<th width="30"><img src="/images/check.png" width="24" height="24" title="Good to go!"/></th>
 	</thead>
 	<tbody>
 	
-	<% guide_entries.each do |entry| 
+	<%
+
+	lastGroup = -1
+
+	guide_entries.each do |entry| 
 
 		needImage = entry.image.nil? || entry.image.empty?
-		needBio = entry.data.nil? || entry.data.empty?
-		%>
+		needBio = entry.bio.nil? || entry.bio.empty?
+
+		if entry.entrytype == 0
+			group = "<tr><td colspan=\"4\"><h3>Individuals</h3></td></tr>"
+		elsif entry.entrytype == 1
+			group = "<tr><td colspan=\"4\"><h3>Church Planters</h3></td></tr>"
+		else 
+			group = "<tr><td colspan=\"4\"><h3>Organizations</h3></td></tr>"
+		end %>
+
+		<%= group if entry.entrytype != lastGroup %>
+		
 		<tr>
 			<td><%= entry.name %></td>
 			<td><%= needImage ? "Yes" : "" %></td>
@@ -45,12 +59,14 @@
 			<td>
 				<%= 
 					if !needImage && !needBio 
-						"<img src=\"/images/check\" width=\"24\" height=\"24\"  title=\"Good to go!\"/>"
+						"<img src=\"/images/check.png\" width=\"24\" height=\"24\"  title=\"Good to go!\"/>"
 					end
 				%>
 			</td>
 		</tr>
-	<% end %>
+	<% 
+		lastGroup = entry.entrytype
+	end %>
 
 	</tbody>
 </table>

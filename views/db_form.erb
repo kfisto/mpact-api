@@ -22,9 +22,19 @@ function hideMessage() {
 	$('#msgline').fadeTo(500, 0);
 }
 
-var entries = [];
+var entries = [],
+	requests = [],
+	totalReqs = 3;
+
 <% guide_entries_all.each do |entry| %>
 	entries.push(<%= entry.to_json %>);
+<% end %>
+
+<% @requests = Request.where('"requests"."entry_id" = ?', guide_entries_all.first.id)
+	@requests.each do |req| %>
+
+	requests.push(<%= req.to_json %>);
+
 <% end %>
 
 function showMessage(message) {
@@ -94,19 +104,73 @@ $(document).ready(function() {
 				return item.id == value;
 			})[0];
 
+		$('#id').val(selectedEntry.id);
 		$('#name').val(selectedEntry.name);
 		$('#image').val(selectedEntry.image);
+		$('#location').val(selectedEntry.location);
 		$('#entrytype').val(selectedEntry.entrytype);
-		$('#contentreadonly').val(selectedEntry.data);
+		$('#bio').val(selectedEntry.bio);
+
+		var url = '/guide/<%= params[:key] %>/entry/' + $('#entry').val() + '/requests' + '?apikey=1138';
+
+		console.log(url);
+
+		$.ajax({
+			type: 'GET',
+			url: url,
+			success: function(result) {
+
+				$('#request1').val('')
+				$('#request2').val('')
+				$('#request3').val('')
+
+				requests = result;
+
+				$.each(requests, function(idx, value) {
+					$('#request' + (idx+1)).val(requests[idx].request);
+				});
+
+			},
+			failure: function(result) {
+				debugger;
+			}
+		});
+
 	});
 
+	$('#id').val(entries[0].id);
 	$('#name').val(entries[0].name);
 	$('#image').val(entries[0].image);
+	$('#location').val(entries[0].location);
+	$('#bio').val(entries[0].bio);
 	$('#entrytype').val(entries[0].entrytype);
-	$('#contentreadonly').val(entries[0].data);
+
+	for (var i = 1, len = requests.length || 3; i <= len; i++) {
+		$('#requests').append(function() {
+			req = "request" + i;
+			input = "<input id=\"" + req + "\" name=\"" + req + "\" size=\"60\" />";
+			return input;
+		});		
+	};
+
+	$.each(requests, function(idx, value) {
+		$('#request' + (idx+1)).val(requests[idx].request);
+	});
+
+	$('#requests').append("<input value=\"Add\" type=\"button\" id=\"addNewReq\" name=\"addNewReq\"/>");
+
 
 	$('#submitBtn').click(function() {
 		$('#submitBtn').disable(true)
+	});
+
+	$('#addNewReq').click(function() {
+		$('#addNewReq').before(function() {
+			totalReqs++;
+			newid = "request" + totalReqs;
+			console.log(newid);
+			return "<br/><input id=\"" + newid + "\" name=\"" + newid + "\" size=\"60\" />";
+		});
 	});
 
 	$('#deleteBtn').click(function() {
@@ -141,12 +205,13 @@ html,body {
 	font-size: .9em;
 }
 form {
-	width: 400px;
+	width: 600px;
 }
 label {
 	display: inline-block;
 	width: 100px;
 	text-align: right;
+	vertical-align: top;
 }
 input[type="submit"],input[type="reset"] {
 	float: right;
@@ -164,35 +229,52 @@ textarea[disabled] {
 	padding: 10px 20px;
 }
 
+input,label {
+	margin: 0.25em 0;
+}
+
 </style>
 
 </head>
 <body>
 <form action="/guide/<%= params[:key] %>/editentry?apikey=1138" method="post" enctype="multipart/form-data">
-	<label for="entry">Entry</label>
+	<label for="entry">Selector</label>
 	<select id="entry" name="entry">
 		<% guide_entries_all.each do |entry| %>
 		<option value="<%= entry[:id] %>"><%= entry[:name] %></option>
 		<% end %>
 	</select><br/>
 
-	<label for="name">Name</label>
+	<label for="name">Entry</label>
+	<input id="id" name="id" disabled size="3"/>
 	<input id="name" name="name"/><br/>
 
 	<label for="image">Photo</label>
 	<input id="image" name="image" size="20" /><br/>
 
-	<label for="datafile">Data File</label>
-	<input type="file" name="datafile"/>
+	<label for="location">Location</label>
+	<input id="location" name="location" size="30" /><br/>
+
+	<!-- <label for="datafile">Data File</label>
+	<input type="file" name="datafile"/><br/> -->
 
 	<label for="entrytype">Entry Type</label>
 	<select id="entrytype" name="entrytype">
-		<option value="0">Person</option>
-		<option value="1">Org</option>
+		<option value="0">Individual</option>
+		<option value="1">Church Planter</option>
+		<option value="2">Organization</option>
 	</select><br/>
 
-	<textarea id="contentreadonly" disabled name="dfcontent" rows="6" cols="75"></textarea>
-	<textarea id="dfcontent" name="dfcontent" rows="6" cols="75"></textarea>
+	<!-- <textarea id="contentreadonly" disabled name="dfcontent" rows="6" cols="75"></textarea>
+	<textarea id="dfcontent" name="dfcontent" rows="6" cols="75"></textarea> -->
+
+	<label for="bio">Bio</label>
+	<textarea id="bio" name="bio" rows="6" cols="60"></textarea><br/>
+
+	<label for="requests">Requests</label>
+	<div id="requests" style="display: inline-block;">
+	
+	</div><br/>
 
 	<br/><br/>
 	<input type="reset"/>

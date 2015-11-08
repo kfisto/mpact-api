@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="/jquery-2.1.1.min.js" type="text/javascript"></script>
+
+<script>
+
+function getUrlParam(param) {
+	var url = window.location.search.substring(1); 	// url after '?'
+	var params = url.split('&');
+	for (var i=0,len=params.length; i < len; i++) {
+		var kvp = params[i].split('=');
+		if (kvp[0] == param) {
+			return decodeURIComponent(kvp[1]);
+		}
+	}
+	return null;
+}
+
+function hideMessage() {
+	$('#msgline').fadeTo(500, 0);
+}
+
+$(document).ready(function() {
+
+	var added = getUrlParam('added'),
+		error = getUrlParam('error'),
+		cat = getUrlParam('cat');
+
+	$('#msgline').hide();
+
+	if (added !== null) {
+		$('#msgline').html("Entry " + added + " added!");
+
+		var initialTop = document.body.scrollHeight + 20 + 1,					// scroll height + top padding + 1 for good measure
+			newTop = document.body.scrollHeight - $('#msgline').outerHeight() - 15 - 1; 	// initial top - outer height - top padding - 15 - 1;
+
+		$('#msgline').show();
+		$('#msgline').offset({ left: 15, top: initialTop });
+		$('#msgline').fadeTo(0,0);
+		$('#msgline').animate({
+			opacity: 1,
+			top: newTop
+		}, 500);
+		setTimeout("hideMessage()", 7000);
+	}
+
+	if (error !== null) {
+		$('#msgline').html(error);
+
+		var initialTop = document.body.scrollHeight + 20 + 1,					// scroll height + top padding + 1 for good measure
+			newTop = document.body.scrollHeight - $('#msgline').outerHeight() - 15 - 1; 	// initial top - outer height - top padding - 15 - 1;
+
+		$('#msgline').show();
+		$('#msgline').offset({ left: 15, top: initialTop });
+		$('#msgline').fadeTo(0,0);
+		$('#msgline').animate({
+			opacity: 1,
+			top: newTop
+		}, 500);
+		setTimeout("hideMessage()", 7000);
+	}
+
+	debugger
+	if (cat !== null) {
+		$('#category').val(cat);
+	}
+
+});
+
+
+
+</script>
+
+<style>
+html,body {
+	font-family: Helvetica,Arial,sans-serif;
+	font-size: .9em;
+}
+form {
+	width: 600px;
+}
+label {
+	display: inline-block;
+	width: 100px;
+	text-align: right;
+	vertical-align: middle;
+}
+input[type="submit"],input[type="reset"] {
+	float: right;
+	min-width: 75px;
+}
+
+#msgline {
+	position: absolute;
+	min-width: 200px;
+	border-radius: 20px;
+	color: white;
+	background-color: #323232;
+	padding: 10px 20px;
+}
+
+</style>
+
+</head>
+<body>
+<form action="/ops/add?apikey=1138" method="post" enctype="multipart/form-data">
+
+	<label for="category">Category</label>
+	<select id="category" name="category">
+		<option value="0">Global</option>
+		<option value="1">National</option>
+		<option value="2">Local</option>
+	</select><br/>
+
+	<label for="what">What</label>
+	<input id="what" name="what"/><br/>
+
+	<label for="when">When</label>
+	<input id="when" name="when"/><br/>
+
+	<label for="where">Where</label>
+	<input id="where" name="where"/><br/>
+
+	<label for="description">Description</label>
+	<textarea id="description" name="description" rows="6" cols="60"></textarea>
+
+	<br/><br/>
+	<input type="submit" value="Add" />
+	<input type="reset"/>
+</form>
+
+<div id="msgline"></div>
+
+</body>
+</html>
+
+
+
