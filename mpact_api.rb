@@ -90,7 +90,8 @@ helpers do
 	end
 
 	def guide_entries_all
-		@guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,entrytype,location') || halt(404)
+		# @guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,entrytype,location') || halt(404)
+		@guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,data,entrytype,location') || halt(404)
 	end
 
 	def guide_entries
@@ -136,7 +137,7 @@ get '/guide/:key/entrieswithreqs' do
 	sorted.to_json
 end
 
-get '/guide/:key/entries' do
+get '/v2/guide/:key/entries' do
 	content_type 'application/json'
 
 	key = params[:key]
@@ -156,6 +157,33 @@ get '/guide/:key/entries' do
 		else 
 			puts "return subset"
 			sorted = guide_entries.select('id,"guideKey",name,image,entrytype')
+		end
+
+	end
+
+	sorted.to_json
+end
+
+get '/guide/:key/entries' do
+	content_type 'application/json'
+
+	key = params[:key]
+
+	puts params[:debug]
+
+	debug = params[:debug].to_bool
+	puts debug ? "debug is true" : "debug is false"
+
+	if key == "refuge"
+		sorted = guide_entries.sort_by &:id
+	else
+
+		if debug == true
+			puts "return all"
+			sorted = guide_entries_all.select('id,"guideKey",name,image,entrytype,data')
+		else 
+			puts "return subset"
+			sorted = guide_entries.select('id,"guideKey",name,image,entrytype,data')
 		end
 
 	end

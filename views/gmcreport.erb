@@ -40,7 +40,8 @@
 	guide_entries.each do |entry| 
 
 		needImage = entry.image.nil? || entry.image.empty?
-		needBio = entry.bio.nil? || entry.bio.empty?
+		# needBio = entry.bio.nil? || entry.bio.empty?
+		needBio = entry.data.nil? || entry.data.empty?
 
 		if entry.entrytype == 0
 			group = "<tr><td colspan=\"4\"><h3>Individuals</h3></td></tr>"
