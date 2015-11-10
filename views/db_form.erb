@@ -110,6 +110,7 @@ $(document).ready(function() {
 		$('#location').val(selectedEntry.location);
 		$('#entrytype').val(selectedEntry.entrytype);
 		$('#bio').val(selectedEntry.bio);
+		$('#contentreadonly').val(selectedEntry.data);
 
 		var url = '/guide/<%= params[:key] %>/entry/' + $('#entry').val() + '/requests' + '?apikey=1138';
 
@@ -143,6 +144,7 @@ $(document).ready(function() {
 	$('#image').val(entries[0].image);
 	$('#location').val(entries[0].location);
 	$('#bio').val(entries[0].bio);
+	$('#contentreadonly').val(entries[0].data);
 	$('#entrytype').val(entries[0].entrytype);
 
 	for (var i = 1, len = requests.length || 3; i <= len; i++) {
