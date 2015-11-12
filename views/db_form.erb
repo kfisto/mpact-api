@@ -111,6 +111,7 @@ $(document).ready(function() {
 		$('#entrytype').val(selectedEntry.entrytype);
 		$('#bio').val(selectedEntry.bio);
 		$('#contentreadonly').val(selectedEntry.data);
+		$('#include').prop('checked', selectedEntry.include);
 
 		var url = '/guide/<%= params[:key] %>/entry/' + $('#entry').val() + '/requests' + '?apikey=1138';
 
@@ -146,6 +147,7 @@ $(document).ready(function() {
 	$('#bio').val(entries[0].bio);
 	$('#contentreadonly').val(entries[0].data);
 	$('#entrytype').val(entries[0].entrytype);
+	$('#include').prop('checked', entries[0].include);
 
 	for (var i = 1, len = requests.length || 3; i <= len; i++) {
 		$('#requests').append(function() {
@@ -163,7 +165,7 @@ $(document).ready(function() {
 
 
 	$('#submitBtn').click(function() {
-		$('#submitBtn').disable(true)
+		$('#submitBtn').prop('disable', true);
 	});
 
 	$('#addNewReq').click(function() {
@@ -235,6 +237,33 @@ input,label {
 	margin: 0.25em 0;
 }
 
+textarea {
+	width: 400px;
+}
+
+#requests {
+	width: 495px;
+}
+
+#requests input {
+	width: 400px;
+}
+#requests input[type="button"] {
+	width: 50px;
+}
+
+input[type="checkbox"] {
+	margin-left: 100px;
+}
+
+input[type="checkbox"] + label {
+	margin-left: 8px;
+}
+
+label.left {
+	text-align: left;
+}
+
 </style>
 
 </head>
@@ -276,8 +305,11 @@ input,label {
 
 	<label for="requests">Requests</label>
 	<div id="requests" style="display: inline-block;">
-	
 	</div><br/>
+
+	<br/>
+	<input type="checkbox" id="include" name="include">
+	<label for="include" class="left">Include</label><br/>
 
 	<br/><br/>
 	<input type="reset"/>

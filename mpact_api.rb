@@ -91,7 +91,7 @@ helpers do
 
 	def guide_entries_all
 		# @guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,entrytype,location') || halt(404)
-		@guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,data,entrytype,location') || halt(404)
+		@guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,data,entrytype,location,include') || halt(404)
 	end
 
 	def guide_entries
@@ -378,7 +378,7 @@ post '/guide/:key/editentry' do
 
 	id = params[:entry]
 
-	Entry.update(id, { :image => params[:image], :name => params[:name], :entrytype => params[:entrytype], :bio => params[:bio], :location => params[:location]})
+	Entry.update(id, { :image => params[:image], :name => params[:name], :entrytype => params[:entrytype], :bio => params[:bio], :location => params[:location], :include => params[:include] })
 
 	reqs_all = params.select { |key,value| key.to_s.match(/^request\d+/) }
 
