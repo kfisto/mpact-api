@@ -95,7 +95,7 @@ helpers do
 	end
 
 	def guide_entries
-		@guide_entries ||= Entry.order('entrytype ASC, name ASC').where('"entries"."guideKey" = ?', params[:key]) || halt(404)
+		@guide_entries ||= Entry.order('entrytype ASC, name ASC').where('"entries"."include" = ? AND "entries"."guideKey" = ?', true, params[:key]) || halt(404)
 		# @guide_entries ||= Entry.order('entrytype ASC, name ASC').where('"entries"."guideKey" = ? AND "entries"."image" != ?', params[:key], "none") || halt(404)
 		# @guide_entries ||= Entry.order('entrytype ASC, name ASC').where('"entries"."guideKey" = ? AND "entries"."image" != ? AND coalesce("entries"."image", \'\') != \'\'', params[:key], "none") || halt(404)
 	end
@@ -122,6 +122,10 @@ helpers do
 		@mission_ops_edit ||= Op.order('id ASC') || halt(404)
 	end
 end
+
+# get '/v2/guide/:key/entrieswithreqs'
+# 	redirect '/guide/:key/entrieswithreqs'
+# end
 
 get '/guide/:key/entrieswithreqs' do
 	content_type 'application/json'
