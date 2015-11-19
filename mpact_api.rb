@@ -123,9 +123,9 @@ helpers do
 	end
 end
 
-# get '/v2/guide/:key/entrieswithreqs'
-# 	redirect '/guide/:key/entrieswithreqs'
-# end
+get '/v2/guide/:key/entrieswithreqs' do
+	redirect '/guide/' + params[:key] + '/entrieswithreqs?apikey=' + params[:apikey]
+end
 
 get '/guide/:key/entrieswithreqs' do
 	content_type 'application/json'
@@ -141,6 +141,7 @@ get '/guide/:key/entrieswithreqs' do
 	sorted.to_json
 end
 
+# v2 GetEntriesForGuide
 get '/v2/guide/:key/entries' do
 	content_type 'application/json'
 
@@ -167,6 +168,7 @@ get '/v2/guide/:key/entries' do
 
 	sorted.to_json
 end
+
 
 get '/guide/:key/entries' do
 	content_type 'application/json'
@@ -355,13 +357,13 @@ post '/guide/:key/entry' do
 	# filename = params[:datafile] if !params[:datafile].nil?
 	# content = params[:dfcontent]
 
-	# nextid = Entry.last.id + 1
+	nextid = Entry.last.id + 1
 
-	# puts nextid.to_s
+	puts nextid.to_s
 
 	if !name.nil?
 		# puts "do stuff"
-		entry = Entry.create(guideKey: params[:key], name: name, image: image, entrytype: params[:entrytype])
+		entry = Entry.create(id: nextid, guideKey: params[:key], name: name, image: image, entrytype: params[:entrytype])
 
 		if !image.nil?
 			entry.image = image
@@ -464,6 +466,8 @@ delete 'guide/entry/:id' do
 	status 202
 	"Entry #{id} deleted."
 end
+
+
 
 
 
