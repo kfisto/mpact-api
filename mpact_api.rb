@@ -156,13 +156,13 @@ get '/v2/guide/:key/entries' do
 		sorted = guide_entries.sort_by &:id
 	else
 
-		if debug == true
-			puts "return all"
-			sorted = guide_entries_all.select('id,"guideKey",name,image,entrytype')
-		else 
-			puts "return subset"
+		# if debug == true
+		# 	puts "return all"
+		# 	sorted = guide_entries_all.select('id,"guideKey",name,image,entrytype')
+		# else 
+		# 	puts "return subset"
 			sorted = guide_entries.select('id,"guideKey",name,image,entrytype')
-		end
+		# end
 
 	end
 
