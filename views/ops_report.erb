@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Ops Report</title>
+
+	<style>
+	html,body {
+		font-family: Helvetica,Arial,sans-serif;
+		font-size: .9em;
+	}
+	th {
+		border-bottom: 1px solid gray;
+		text-align: left;
+	}
+	tr:nth-child(even) {
+		background-color: #eee;
+	}
+	th,td {
+		padding: 5px;
+	}
+
+	</style>
+
+</head>
+<body>
+
+<table>
+	<thead>
+		<th width="250">What</th>
+		<th width="150">When</th>
+		<th width="150">Where</th>
+	</thead>
+	<tbody>
+	
+	<%
+
+	lastGroup = -1
+
+	mission_ops.each do |op| %>
+
+		<%= group if op.category != lastGroup %>
+		
+		<tr>
+			<td><%= op.what %></td>
+			<td><%= op.when %></td>
+			<td><%= op.where %></td>
+		</tr>
+	<% 
+		lastGroup = op.category
+	end %>
+
+	</tbody>
+</table>
+
+</body>
+</html>

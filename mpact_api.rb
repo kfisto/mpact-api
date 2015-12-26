@@ -294,6 +294,9 @@ end
 get '/ops/edit' do
 	erb :edit_op_form
 end
+get '/ops/report' do
+	erb :ops_report
+end
 post '/ops/add' do
 	puts "add " + params[:description]
 
