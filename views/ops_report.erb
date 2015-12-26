@@ -26,7 +26,7 @@
 
 <table>
 	<thead>
-		<th width="250">What</th>
+		<th width="200">What</th>
 		<th width="150">When</th>
 		<th width="150">Where</th>
 	</thead>
@@ -34,11 +34,11 @@
 	
 	<%
 
-	lastGroup = -1
+	lastCat = -1
 
 	mission_ops.each do |op| %>
 
-		<%= group if op.category != lastGroup %>
+		<%= group if op.category != lastCat %>
 		
 		<tr>
 			<td><%= op.what %></td>
@@ -46,7 +46,7 @@
 			<td><%= op.where %></td>
 		</tr>
 	<% 
-		lastGroup = op.category
+		lastCat = op.category
 	end %>
 
 	</tbody>
