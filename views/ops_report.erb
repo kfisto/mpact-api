@@ -38,6 +38,14 @@
 
 	mission_ops.each do |op| %>
 
+		if op.category == 0
+			group = "<tr><td colspan=\"4\"><h3>Local</h3></td></tr>"
+		elsif op.category == 1
+			group = "<tr><td colspan=\"4\"><h3>National</h3></td></tr>"
+		else 
+			group = "<tr><td colspan=\"4\"><h3>Global</h3></td></tr>"
+		end %>
+
 		<%= group if op.category != lastCat %>
 		
 		<tr>
