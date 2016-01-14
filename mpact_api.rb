@@ -426,7 +426,7 @@ post '/deleteguide/:id' do
 end
 
 # edit guide
-post '/editguide/:id' do
+post '/editguide' do
 
 	id = params[:guide]
 
