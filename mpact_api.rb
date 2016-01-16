@@ -426,13 +426,13 @@ post '/deleteguide/:id' do
 end
 
 # edit guide
-post '/editguide/:id' do
+post '/editguide' do
 
 	id = params[:guide]
 
 	Guide.update(id, { :image => params[:image], :title => params[:title], :textLabel => params[:textLabel]})
 
-	redirect '/guide/edit?apikey=1138&edited=' + id.to_s
+	redirect '/guides/edit?apikey=1138&edited=' + id.to_s
 end
 
 post '/addguide' do
