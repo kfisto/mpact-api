@@ -56,7 +56,18 @@ $(document).ready(function() {
 
 	var edited = getUrlParam('edited'),
 		deleted = getUrlParam('deleted'),
-		error = getUrlParam('error');
+		error = getUrlParam('error'),
+
+		addAddNewReqHandler = function() {
+			$('#addNewReq').click(function() {
+				$('#addNewReq').before(function() {
+					totalReqs++;
+					newid = "request" + totalReqs;
+					console.log(newid);
+					return "<br/><input id=\"" + newid + "\" name=\"" + newid + "\" size=\"60\" />";
+				});
+			});
+		};
 
 	$('#msgline').hide();
 
@@ -122,15 +133,23 @@ $(document).ready(function() {
 			url: url,
 			success: function(result) {
 
-				$('#request1').val('')
-				$('#request2').val('')
-				$('#request3').val('')
-
 				requests = result;
+
+				$('#requests').empty();
+				for (var i = 1, len = requests.length || 3; i <= len; i++) {
+					$('#requests').append(function() {
+						req = "request" + i;
+						input = "<input id=\"" + req + "\" name=\"" + req + "\" size=\"60\" />";
+						return input;
+					});
+				};
 
 				$.each(requests, function(idx, value) {
 					$('#request' + (idx+1)).val(requests[idx].request);
 				});
+
+				$('#requests').append("<input value=\"Add\" type=\"button\" id=\"addNewReq\" name=\"addNewReq\"/>");
+				addAddNewReqHandler();
 
 			},
 			failure: function(result) {
@@ -154,7 +173,7 @@ $(document).ready(function() {
 			req = "request" + i;
 			input = "<input id=\"" + req + "\" name=\"" + req + "\" size=\"60\" />";
 			return input;
-		});		
+		});
 	};
 
 	$.each(requests, function(idx, value) {
@@ -162,20 +181,13 @@ $(document).ready(function() {
 	});
 
 	$('#requests').append("<input value=\"Add\" type=\"button\" id=\"addNewReq\" name=\"addNewReq\"/>");
-
+	addAddNewReqHandler();
 
 	$('#submitBtn').click(function() {
 		$('#submitBtn').prop('disable', true);
 	});
 
-	$('#addNewReq').click(function() {
-		$('#addNewReq').before(function() {
-			totalReqs++;
-			newid = "request" + totalReqs;
-			console.log(newid);
-			return "<br/><input id=\"" + newid + "\" name=\"" + newid + "\" size=\"60\" />";
-		});
-	});
+	
 
 	$('#deleteBtn').click(function() {
 		if (confirm('Delete ' + $('#name').val() + ' from the database?')) {
