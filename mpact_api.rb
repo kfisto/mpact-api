@@ -471,7 +471,23 @@ delete 'guide/entry/:id' do
 end
 
 
+post '/copyrequests/:from/:to' do
+	fromEntryReqs = Request.where('"requests"."entry_id" = ?', params[:from])
 
+	toEntry = Entry.find_by_id(params[:to])
+
+	fromEntryReqs.each do |req|
+
+		lastReq = Request.last
+		nextid = lastReq.nil? ? 1 : lastReq.id + 1
+
+		# req = Request.create(id: nextid, )
+		toEntry.requests.create(request: req.request)
+
+	end
+	
+	redirect '/guide/' + toEntry.guideKey + '/editentries?apikey=1138&edited=' + params[:to].to_s
+end
 
 
 

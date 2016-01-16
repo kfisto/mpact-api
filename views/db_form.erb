@@ -211,6 +211,28 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#copyBtn').click(function() {
+		if (confirm('Copy requests from ' + $('#entry').val() + ' to entry: ' + $('#copyToEntry').val() + '?')) {
+
+			var url = '/copyrequests/' + $('#entry').val() + '/' + $('#copyToEntry').val() + '?apikey=1138';
+// debugger;
+			console.log(url);
+
+			$.ajax({
+				type: 'POST',
+				url: url,
+				success: function(result) {
+					window.location.href = '/guide/<%= params[:key] %>/editentries?apikey=1138&edited=' + $('#copyToEntry').val()
+				},
+				failure: function(result) {
+					debugger;
+				}
+			});
+		} else {
+			$('#msgline').html('Copy requests canceled.');
+		}
+	});
+
 });
 
 </script>
@@ -322,6 +344,18 @@ label.left {
 	<br/>
 	<input type="checkbox" id="include" name="include">
 	<label for="include" class="left">Include</label><br/>
+
+	<br/>
+	<label for="copyToEntry">Copy requests to entry:</label>
+	<select id="copyToEntry" name="copyToEntry">
+		<% guide_entries_all.each do |entry| %>
+		<option value="<%= entry[:id] %>"><%= entry[:name] %></option>
+		<% end %>
+	</select>
+	<input type="button" id="copyBtn" value="Copy"/>
+
+
+	<br/>
 
 	<br/><br/>
 	<input type="reset"/>
