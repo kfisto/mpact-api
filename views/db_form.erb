@@ -56,6 +56,7 @@ $(document).ready(function() {
 
 	var edited = getUrlParam('edited'),
 		deleted = getUrlParam('deleted'),
+		deletedreq = getUrlParam('deletedreq'),
 		error = getUrlParam('error'),
 
 		addAddNewReqHandler = function() {
@@ -67,12 +68,35 @@ $(document).ready(function() {
 					return "<br/><input id=\"" + newid + "\" name=\"" + newid + "\" size=\"60\" />";
 				});
 			});
+		},
+
+		deleteReqHandler = function() {
+			var btn = this,
+				reqId = btn.attributes.dataValue.value,
+				url = '/guide/<%= params[:key] %>/deleterequest/' + reqId + '?apikey=1138';
+
+			console.log(url);
+
+			$.ajax({
+				type: 'POST',
+				url: url,
+				success: function(result) {
+					window.location.href = '/guide/<%= params[:key] %>/editentries?apikey=1138&deletedreq=' + reqId;
+				},
+				failure: function(result) {
+					debugger;
+				}
+			});
 		};
 
 	$('#msgline').hide();
 
 	if (deleted !== null) {
 		showMessage("Entry " + deleted + " deleted!");
+	}
+
+	if (deletedreq !== null) {
+		showMessage("Request " + deletedreq + " deleted!");
 	}
 
 	if (edited !== null) {
@@ -140,8 +164,16 @@ $(document).ready(function() {
 					$('#requests').append(function() {
 						req = "request" + i;
 						input = "<input id=\"" + req + "\" name=\"" + req + "\" size=\"60\" />";
+
+						if (requests[i-1]) {
+							input += "<input type=\"button\" id=\"delReq" + i + "\" name=\"delReq" + i + "\"datavalue=\"" + requests[i-1].id + "\" value=\"x\" style=\"width:18px\"/>";
+						}
 						return input;
 					});
+
+					if (requests[i-1]) {
+						$('#delReq' + i).click(deleteReqHandler);
+					}
 				};
 
 				$.each(requests, function(idx, value) {
@@ -172,8 +204,18 @@ $(document).ready(function() {
 		$('#requests').append(function() {
 			req = "request" + i;
 			input = "<input id=\"" + req + "\" name=\"" + req + "\" size=\"60\" />";
+
+			if (requests[i-1]) {
+				input += "<input type=\"button\" id=\"delReq" + i + "\" name=\"delReq" + i + "\" datavalue=\"" + requests[i-1].id + "\" value=\"x\" style=\"width: 18px\"/>";
+
+			}
+
 			return input;
 		});
+
+		if (requests[i-1]) {
+			$('#delReq' + i).click(deleteReqHandler);
+		}
 	};
 
 	$.each(requests, function(idx, value) {
@@ -186,8 +228,6 @@ $(document).ready(function() {
 	$('#submitBtn').click(function() {
 		$('#submitBtn').prop('disable', true);
 	});
-
-	
 
 	$('#deleteBtn').click(function() {
 		if (confirm('Delete ' + $('#name').val() + ' from the database?')) {
@@ -215,7 +255,7 @@ $(document).ready(function() {
 		if (confirm('Copy requests from ' + $('#entry').val() + ' to entry: ' + $('#copyToEntry').val() + '?')) {
 
 			var url = '/copyrequests/' + $('#entry').val() + '/' + $('#copyToEntry').val() + '?apikey=1138';
-// debugger;
+
 			console.log(url);
 
 			$.ajax({

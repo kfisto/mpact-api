@@ -489,7 +489,17 @@ post '/copyrequests/:from/:to' do
 	redirect '/guide/' + toEntry.guideKey + '/editentries?apikey=1138&edited=' + params[:to].to_s
 end
 
+post '/guide/:key/deleterequest/:id' do
+	id = params[:id]
+	request = Request.find(id)
+	return status 404 if request.nil?
 
+	request.delete
+	status 202
+
+	redirect '/guide/' + params[:key] + '/editentries?apikey=1138&deletedreq=' + id.to_s
+
+end
 
 #################
 # Static (image) handler
