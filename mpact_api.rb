@@ -40,6 +40,8 @@ end
 
 # use Rack::MethodOverride
 
+set :method_override, true
+
 set :public_folder, 'public'
 
 class Guide < ActiveRecord::Base
@@ -71,7 +73,8 @@ end
 
 
 get '/' do
-  'mpact api'
+  # 'mpact api'
+  erb :readme
 end
 
 get '/guides' do
@@ -79,9 +82,9 @@ get '/guides' do
 	Guide.limit(5).to_json
 end
 
-get '/guides/edit' do
-	erb :edit_guide
-end
+# get '/guides/edit' do
+# 	erb :edit_guide
+# end
 
 
 helpers do
@@ -90,14 +93,11 @@ helpers do
 	end
 
 	def guide_entries_all
-		# @guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,entrytype,location') || halt(404)
-		@guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,data,entrytype,location,include') || halt(404)
+		@guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,entrytype,location,include') || halt(404)
 	end
 
 	def guide_entries
 		@guide_entries ||= Entry.order('entrytype ASC, name ASC').where('"entries"."include" = ? AND "entries"."guideKey" = ?', true, params[:key]) || halt(404)
-		# @guide_entries ||= Entry.order('entrytype ASC, name ASC').where('"entries"."guideKey" = ? AND "entries"."image" != ?', params[:key], "none") || halt(404)
-		# @guide_entries ||= Entry.order('entrytype ASC, name ASC').where('"entries"."guideKey" = ? AND "entries"."image" != ? AND coalesce("entries"."image", \'\') != \'\'', params[:key], "none") || halt(404)
 	end
 
 	def entry_requests
@@ -161,7 +161,7 @@ get '/v2/guide/:key/entries' do
 		# 	sorted = guide_entries_all.select('id,"guideKey",name,image,entrytype')
 		# else 
 		# 	puts "return subset"
-			sorted = guide_entries.select('id,"guideKey",name,image,entrytype')
+			sorted = guide_entries.select('id,"guideKey",name,image,entrytype,bio')
 		# end
 
 	end
@@ -288,15 +288,15 @@ end
 #end notes processing
 
 #mission ops
-get '/ops/add' do
-	erb :add_op_form
-end
-get '/ops/edit' do
-	erb :edit_op_form
-end
-get '/ops/report' do
-	erb :ops_report
-end
+# get '/ops/add' do
+# 	erb :add_op_form
+# end
+# get '/ops/edit' do
+# 	erb :edit_op_form
+# end
+# get '/ops/report' do
+# 	erb :ops_report
+# end
 post '/ops/add' do
 	puts "add " + params[:description]
 
@@ -334,9 +334,9 @@ get '/ops' do
 end
 #end mission ops
 
-get '/guide/:key/addentry' do
-	erb :add_form
-end
+# get '/guide/:key/addentry' do
+# 	erb :add_form
+# end
 
 get '/entry/:idx' do
 	content_type 'application/json'
@@ -379,9 +379,9 @@ post '/guide/:key/entry' do
 
 end
 
-get '/guide/:key/editentries' do
-	erb :db_form
-end
+# get '/guide/:key/editentries' do
+# 	erb :db_form
+# end
 
 post '/guide/:key/editentry' do
 
@@ -500,6 +500,323 @@ post '/guide/:key/deleterequest/:id' do
 	redirect '/guide/' + params[:key] + '/editentries?apikey=1138&deletedreq=' + id.to_s
 
 end
+
+
+
+##############################################################################################################
+# API version 3
+get '/v3/guides' do
+	content_type 'application/json'
+	Guide.limit(5).to_json
+end
+
+get '/v3/guides/edit' do
+	erb :edit_guide
+end
+
+# Get guide at index
+get '/v3/guide/:id' do
+	content_type 'application/json'
+
+	guide = Guide.find_by_id(params[:id])
+
+	return status 404 if guide.nil?
+
+	guide.to_json
+end
+
+# Edit guide
+post '/v3/guide/:id' do
+	id = params[:id]
+
+	Guide.update(id, { :image => params[:image], :title => params[:title], :textLabel => params[:textLabel]})
+
+	redirect '/v3/guides/edit?apikey=1138&edited=' + id.to_s
+end
+
+# create guide
+post '/v3/guide' do
+
+	newGuide = Guide.create(
+		key: params[:guide_new],
+		image: params[:image],
+		title: params[:title],
+		textLabel: params[:textLabel])
+	
+	redirect '/v3/guides/edit?apikey=1138&added=' + newGuide.id.to_s
+end
+#end guide resources
+
+
+
+#guide entries
+get '/v3/guide/:key/entries/edit' do
+	erb :db_form
+end
+
+
+# post '/v3/guide/:key/entry' do
+# 	entry = nil
+
+# 	name = params[:name]
+# 	image = params[:image]
+
+# 	nextid = Entry.last.id + 1
+
+# 	puts nextid.to_s
+
+# 	if !name.nil?
+# 		entry = Entry.create(id: nextid, guideKey: params[:key], name: name, image: image, entrytype: params[:entrytype])
+
+# 		if !image.nil?
+# 			entry.image = image
+# 		end
+
+# 		redirect '/v3/guide/' + params[:key] + '/entries/edit?apikey=1138&added=' + entry.id.to_s + '&et=' + entry.entrytype.to_s
+# 	else
+# 		redirect '/v3/guide/' + params[:key] + '/entries/edit?apikey=1138&error=Error adding new entry.'
+# 	end
+# end
+# post '/v3/guide/:key/entry/:entryid' do
+# 	entryid = params[:entryid]
+
+# 	Entry.update(entryid, { :image => params[:image], :name => params[:name], :entrytype => params[:entrytype], :bio => params[:bio], :location => params[:location], :include => params[:include] })
+
+# 	reqs_all = params.select { |key,value| key.to_s.match(/^request\d+/) }
+
+# 	puts reqs_all
+
+# 	theEntry = Entry.find_by_id(id)
+
+# 	theEntry.requests.delete_all
+
+# 	reqs_all.each_with_index { |item, idx| 
+# 		req = item[1]
+# 		req.strip
+# 		if req.length > 0
+# 			theEntry.requests.create(request: req)
+# 		end
+# 	}
+
+# 	redirect '/v3/guide/' + params[:key] + '/entries?apikey=1138&edited=' + id.to_s
+# end
+
+
+
+# v3 GetEntriesForGuide
+get '/v3/guide/:key/entries' do
+	content_type 'application/json'
+
+	key = params[:key]
+
+	if key == "refuge"
+		sorted = guide_entries.sort_by &:id
+	else
+		sorted = guide_entries.select('id,"guideKey",name,image,entrytype,bio')
+	end
+
+	sorted.to_json
+end
+
+# get a single entry for "today" functionality (per guide)
+get '/v3/guide/:key/entries/today' do
+	content_type 'application/json'
+	
+	start_date = Date.new(2014, 7, 21)
+	today = Date.today
+	diff = (today-start_date).to_i
+	idx = diff % guide_entries.length
+
+	#production
+	guide_entries[idx-1].to_json
+
+end
+#end guide entries
+
+
+# entries/requests
+# GET entry by Index
+get '/v3/entry/:idx' do
+	content_type 'application/json'
+
+	theEntry = Entry.find_by_id(params[:idx])
+
+	theEntry.to_json
+end
+
+post '/v3/entry' do
+	entry = nil
+
+	guide = params[:guidekey]
+	name = params[:name]
+	image = params[:image]
+
+	nextid = Entry.last.id + 1
+
+	puts nextid.to_s
+
+	if !name.nil?
+		entry = Entry.create(id: nextid, guideKey: guide, name: name, image: image, entrytype: params[:entrytype])
+
+		if !image.nil?
+			entry.image = image
+		end
+
+		redirect '/v3/guide/' + guide + '/entries/edit?apikey=1138&added=' + entry.id.to_s + '&et=' + entry.entrytype.to_s
+	else
+		redirect '/v3/guide/' + guide + '/entries/edit?apikey=1138&error=Error adding new entry.'
+	end
+end
+
+# Edit Entry by index
+post '/v3/entry/:id' do
+	id = params[:id]
+
+	Entry.update(id, { :image => params[:image], :name => params[:name], :entrytype => params[:entrytype], :bio => params[:bio], :location => params[:location], :include => params[:include] })
+
+	reqs_all = params.select { |key,value| key.to_s.match(/^request\d+/) }
+
+	puts reqs_all
+
+	theEntry = Entry.find_by_id(id)
+
+	theEntry.requests.delete_all
+
+	reqs_all.each_with_index { |item, idx| 
+		req = item[1]
+		req.strip
+		if req.length > 0
+			theEntry.requests.create(request: req)
+		end
+	}
+
+	redirect '/v3/guide/' + params[:guidekey] + '/entries/edit?apikey=1138&edited=' + id.to_s
+end
+# GET requests for Entry
+get '/v3/entry/:id/requests' do
+	content_type 'application/json'
+
+	theEntry = Entry.find_by_id(params[:id])
+	requests = theEntry.requests || []
+
+	requests.to_json
+end
+# DELETE entry
+delete '/v3/entry/:id' do
+	puts "*******************************************"
+	puts params[:_method]
+	puts "*******************************************"
+
+	id = params[:id]
+
+	entry = Entry.find(id)
+	return status 404 if entry.nil?
+	entry.delete
+	status 200
+	"Entry #{id} deleted."
+end
+
+
+# DELETE request
+delete '/v3/request/:id' do
+	id = params[:id]
+	request = Request.find(id)
+	return status 404 if request.nil?
+
+	request.delete
+	status 200
+
+	# redirect '/v3/guide/' + params[:guidekey] + '/entries/edit?apikey=1138&deletedreq=' + id.to_s
+end
+
+# post '/copyrequests/:from/:to' do
+post '/v3/requests/copy' do
+	fromEntryReqs = Request.where('"requests"."entry_id" = ?', params[:from])
+
+	toEntry = Entry.find_by_id(params[:to])
+
+	fromEntryReqs.each do |req|
+
+		lastReq = Request.last
+		nextid = lastReq.nil? ? 1 : lastReq.id + 1
+
+		# req = Request.create(id: nextid, )
+		toEntry.requests.create(request: req.request)
+
+	end
+	
+	status 200
+	# redirect '/v3/guide/' + toEntry.guideKey + '/entries/edit?apikey=1138&edited=' + params[:to].to_s
+end
+
+
+
+
+#mission ops
+get '/v3/ops/edit' do
+	erb :edit_op_form
+end
+get '/v3/ops/report' do
+	erb :ops_report
+end
+post '/v3/op' do
+	puts "add " + params[:description]
+
+	op = Op.create(
+			category: params[:category].to_i,
+			what: params[:what],
+			when: params[:when],
+			where: params[:where],
+			description: params[:description])
+
+	redirect '/v3/ops/edit?apikey=1138&added=' + op.id.to_s + '&cat=' + op.category.to_s
+end
+
+get '/v3/op/:id' do
+	content_type 'application/json'
+
+	op = Op.find_by_id(params[:id])
+
+	return status 404 if op.nil?
+
+	op.to_json
+end
+
+post '/v3/op/:id' do
+	puts "edit " + params[:description]
+
+	id = params[:id]
+	Op.update(
+		id, {
+			:category => params[:category].to_i,
+			:what => params[:what],
+			:when => params[:when],
+			:where => params[:where],
+			:description => params[:description]
+		})
+
+	redirect '/v3/ops/edit?apikey=1138&edited=' + id.to_s
+end
+
+get '/v3/ops' do
+	content_type 'application/json'
+	
+	cat = params[:category]
+
+	if cat.nil? || cat.empty?
+		mission_ops.to_json
+	else
+		mission_ops.where('ops.category = ?', cat.to_s).to_json
+	end
+end
+#end mission ops
+
+
+
+
+
+
+
 
 #################
 # Static (image) handler

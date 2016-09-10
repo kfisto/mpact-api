@@ -84,19 +84,63 @@ $(document).ready(function() {
 		$('#where').val(selectedOp.where);
 		$('#description').val(selectedOp.description);
 
+		// Edit form action url with selected guide		
+		$('#main').attr('action', '/v3/op/' + selectedOp.id + '?apikey=1138');
+
 	});
 
 
 	// set fields on load
-	$('#category').val(ops[0].category);
-	$('#what').val(ops[0].what);
-	$('#when').val(ops[0].when);
-	$('#where').val(ops[0].where);
-	$('#description').val(ops[0].description);
+	if (ops.length > 0) {
+		$('#category').val(ops[0].category);
+		$('#what').val(ops[0].what);
+		$('#when').val(ops[0].when);
+		$('#where').val(ops[0].where);
+		$('#description').val(ops[0].description);
+
+		$('#main').attr('action', '/v3/op/' + ops[0].id + '?apikey=1138');
+	}
+
+	$('#addBtn').click(function() {
+
+		$('#id').hide();
+		// $('#op_new').show();
+		$('#cancelBtn').show();
+		$('#addBtn').hide();
+
+		$('#what').val('');
+		$('#when').val('');
+		$('#where').val('');
+		$('#description').val('');
+
+		$('#category').focus();
+
+		$('#main').attr('action', '/v3/op?apikey=1138')
+
+		$('#submitBtn').prop('value', 'Create');
+		
+	});
+
+	$('#cancelBtn').click(function() {
+
+		$('#id').show();
+		$('#cancelBtn').hide();
+		$('#addBtn').show();
+
+		$('#category').val(ops[0].category);
+		$('#what').val(ops[0].what);
+		$('#when').val(ops[0].when);
+		$('#where').val(ops[0].where);
+		$('#description').val(ops[0].description);
+
+		$('#main').attr('action', '/op/' + ops[0].id + '?apikey=1138')
+
+		$('#submitBtn').prop('value', 'Update');
+		
+	});
 
 });
-
-
+// end ready
 
 </script>
 
@@ -132,14 +176,18 @@ input[type="submit"],input[type="reset"] {
 
 </head>
 <body>
-<form action="/ops/edit?apikey=1138" method="post" enctype="multipart/form-data">
+<form id="main" action="/ops/edit?apikey=1138" method="post" enctype="multipart/form-data">
 
 	<label for="id">Op</label>
 	<select id="id" name="id">
 		<% mission_ops_edit.each do |op| %>
 		<option value="<%= op[:id] %>"><%= op[:id] %></option>
 		<% end %>
-	</select><br/>
+	</select>
+
+	<input id="op_new" name="op_new" size="20" style="display: none;" />
+	<input type="button" id="addBtn" value="Add" />
+	<input type="button" id="cancelBtn" value="Cancel New" style="display: none;" /><br/>
 
 	<label for="category">Category</label>
 	<select id="category" name="category">
@@ -161,8 +209,8 @@ input[type="submit"],input[type="reset"] {
 	<textarea id="description" name="description" rows="6" cols="60"></textarea>
 
 	<br/><br/>
-	<input type="submit" value="Edit" />
 	<input type="reset"/>
+	<input type="submit" value="Update" id="submitBtn" />
 </form>
 
 <div id="msgline"></div>

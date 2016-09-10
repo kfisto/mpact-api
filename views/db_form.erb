@@ -59,6 +59,8 @@ $(document).ready(function() {
 		deletedreq = getUrlParam('deletedreq'),
 		error = getUrlParam('error'),
 
+		currentEntryIdx = 0,
+
 		addAddNewReqHandler = function() {
 			$('#addNewReq').click(function() {
 				$('#addNewReq').before(function() {
@@ -73,15 +75,19 @@ $(document).ready(function() {
 		deleteReqHandler = function() {
 			var btn = this,
 				reqId = btn.attributes.dataValue.value,
-				url = '/guide/<%= params[:key] %>/deleterequest/' + reqId + '?apikey=1138';
+				url = '/v3/request/' + reqId + '?apikey=1138&&guidekey=<%= params[:key] %>';
 
 			console.log(url);
 
 			$.ajax({
-				type: 'POST',
+				type: 'DELETE',
 				url: url,
 				success: function(result) {
-					window.location.href = '/guide/<%= params[:key] %>/editentries?apikey=1138&deletedreq=' + reqId;
+					showMessage('Request ' + reqId + ' deleted!');
+
+					getRequests();
+
+					// window.location.href = '/v3/guide/<%= params[:key] %>/entries/edit?apikey=1138&deletedreq=' + reqId;
 				},
 				failure: function(result) {
 					debugger;
@@ -95,24 +101,12 @@ $(document).ready(function() {
 		showMessage("Entry " + deleted + " deleted!");
 	}
 
-	if (deletedreq !== null) {
-		showMessage("Request " + deletedreq + " deleted!");
-	}
+	// if (deletedreq !== null) {
+	// 	showMessage("Request " + deletedreq + " deleted!");
+	// }
 
 	if (edited !== null) {
-		$('#msgline').html("Entry " + edited + " updated!");
-
-		var initialTop = document.body.scrollHeight + 20 + 1,					// scroll height + top padding + 1 for good measure
-			newTop = document.body.scrollHeight - $('#msgline').outerHeight() - 15 - 1; 	// initial top - outer height - top padding - 15 - 1;
-
-		$('#msgline').show();
-		$('#msgline').offset({ left: 15, top: initialTop });
-		$('#msgline').fadeTo(0,0);
-		$('#msgline').animate({
-			opacity: 1,
-			top: newTop
-		}, 500);
-		setTimeout("hideMessage()", 7000);
+		showMessage('Entry ' + edited + ' updated!');
 	}
 
 	if (error !== null) {
@@ -134,6 +128,9 @@ $(document).ready(function() {
 
 
 	$('#entry').change(function () {
+
+		currentEntryIdx = $('#entry option:selected').index();
+
 		var value = $('select option:selected').val(),
 			selectedEntry = $.grep(entries, function(item) {
 				return item.id == value;
@@ -148,47 +145,9 @@ $(document).ready(function() {
 		$('#contentreadonly').val(selectedEntry.data);
 		$('#include').prop('checked', selectedEntry.include);
 
-		var url = '/guide/<%= params[:key] %>/entry/' + $('#entry').val() + '/requests' + '?apikey=1138';
+		$('#main').attr('action', '/v3/entry/' + selectedEntry.id + '?apikey=1138');
 
-		console.log(url);
-
-		$.ajax({
-			type: 'GET',
-			url: url,
-			success: function(result) {
-
-				requests = result;
-
-				$('#requests').empty();
-				for (var i = 1, len = requests.length || 3; i <= len; i++) {
-					$('#requests').append(function() {
-						req = "request" + i;
-						input = "<input id=\"" + req + "\" name=\"" + req + "\" size=\"60\" />";
-
-						if (requests[i-1]) {
-							input += "<input type=\"button\" id=\"delReq" + i + "\" name=\"delReq" + i + "\"datavalue=\"" + requests[i-1].id + "\" value=\"x\" style=\"width:18px\"/>";
-						}
-						return input;
-					});
-
-					if (requests[i-1]) {
-						$('#delReq' + i).click(deleteReqHandler);
-					}
-				};
-
-				$.each(requests, function(idx, value) {
-					$('#request' + (idx+1)).val(requests[idx].request);
-				});
-
-				$('#requests').append("<input value=\"Add\" type=\"button\" id=\"addNewReq\" name=\"addNewReq\"/>");
-				addAddNewReqHandler();
-
-			},
-			failure: function(result) {
-				debugger;
-			}
-		});
-
+		getRequests();
 	});
 
 	$('#id').val(entries[0].id);
@@ -196,9 +155,11 @@ $(document).ready(function() {
 	$('#image').val(entries[0].image);
 	$('#location').val(entries[0].location);
 	$('#bio').val(entries[0].bio);
-	$('#contentreadonly').val(entries[0].data);
+	// $('#contentreadonly').val(entries[0].data);
 	$('#entrytype').val(entries[0].entrytype);
 	$('#include').prop('checked', entries[0].include);
+
+	$('#guidekey').val(entries[0].guideKey);
 
 	for (var i = 1, len = requests.length || 3; i <= len; i++) {
 		$('#requests').append(function() {
@@ -225,22 +186,75 @@ $(document).ready(function() {
 	$('#requests').append("<input value=\"Add\" type=\"button\" id=\"addNewReq\" name=\"addNewReq\"/>");
 	addAddNewReqHandler();
 
-	$('#submitBtn').click(function() {
-		$('#submitBtn').prop('disable', true);
+
+	$('#main').attr('action', '/v3/entry/' + entries[0].id + '?apikey=1138');
+
+	$('#addBtn').click(function() {
+
+		$('#guide').hide();
+		// $('#entry_new').show();
+		$('#cancelBtn').show();
+		$('#addBtn').hide();
+
+		$('#name').val('');
+		$('#image').val('');
+		$('#location').val('');
+		$('#bio').val('');
+		$('#entrytype').val(0);
+		$('#include').prop('checked', true);
+
+		$('#name').focus();
+
+		$('#guidekey').val('<%= params[:key] %>');
+
+		// clear requests
+		requestsHandler([]);
+
+		$('#main').attr('action', '/v3/entry?apikey=1138')
+		
 	});
+
+	$('#cancelBtn').click(function() {
+
+		$('#guide').show();
+		// $('#entry_new').hide();
+		$('#cancelBtn').hide();
+		$('#addBtn').show();
+
+		$('#id').val(entries[currentEntryIdx].id);
+		$('#name').val(entries[currentEntryIdx].name);
+		$('#image').val(entries[currentEntryIdx].image);
+		$('#location').val(entries[currentEntryIdx].location);
+		$('#bio').val(entries[currentEntryIdx].bio);
+
+		$('#guidekey').val(entries[currentEntryIdx].guideKey);
+
+		// $('#contentreadonly').val(entries[currentEntryIdx].data);
+		$('#entrytype').val(entries[currentEntryIdx].entrytype);
+		$('#include').prop('checked', entries[currentEntryIdx].include);
+
+		getRequests();
+
+		$('#main').attr('action', '/v3/entry/' + entries[currentEntryIdx].id + '?apikey=1138')
+		
+	});
+
+	// $('#submitBtn').click(function() {
+	// 	$('#submitBtn').prop('disable', true);
+	// });
 
 	$('#deleteBtn').click(function() {
 		if (confirm('Delete ' + $('#name').val() + ' from the database?')) {
 
-			var url = '/guide/<%= params[:key] %>/deleteentry/' + $('#entry').val() + '?apikey=1138';
+			var url = '/v3/entry/' + $('#entry').val() + '?apikey=1138';
 
 			console.log(url);
 
 			$.ajax({
-				type: 'POST',
+				type: 'DELETE',
 				url: url,
 				success: function(result) {
-					window.location.href = '/guide/<%= params[:key] %>/editentries?apikey=1138&deleted=' + $('#entry').val()
+					window.location.href = '/v3/guide/<%= params[:key] %>/entries/edit?apikey=1138&deleted=' + $('#entry').val()
 				},
 				failure: function(result) {
 					debugger;
@@ -254,7 +268,7 @@ $(document).ready(function() {
 	$('#copyBtn').click(function() {
 		if (confirm('Copy requests from ' + $('#entry').val() + ' to entry: ' + $('#copyToEntry').val() + '?')) {
 
-			var url = '/copyrequests/' + $('#entry').val() + '/' + $('#copyToEntry').val() + '?apikey=1138';
+			var url = '/v3/requests/copy?from=' + $('#entry').val() + '&to=' + $('#copyToEntry').val() + '&apikey=1138';
 
 			console.log(url);
 
@@ -262,7 +276,10 @@ $(document).ready(function() {
 				type: 'POST',
 				url: url,
 				success: function(result) {
-					window.location.href = '/guide/<%= params[:key] %>/editentries?apikey=1138&edited=' + $('#copyToEntry').val()
+					// window.location.href = '/v3/guide/<%= params[:key] %>/entries/edit?apikey=1138&edited=' + $('#copyToEntry').val()
+
+					showMessage('Entry ' + $('#copyToEntry').val() + ' edited!');
+
 				},
 				failure: function(result) {
 					debugger;
@@ -272,6 +289,54 @@ $(document).ready(function() {
 			$('#msgline').html('Copy requests canceled.');
 		}
 	});
+
+
+	var getRequests = function() {
+		var url = '/v3/entry/' + $('#entry').val() + '/requests' + '?apikey=1138';
+
+		console.log(url);
+
+		$.ajax({
+			type: 'GET',
+			url: url,
+			success: function(result) {
+
+				requests = result;
+				requestsHandler(requests);
+
+			},
+			failure: function(result) {
+				debugger;
+			}
+		});
+	}
+
+	var requestsHandler = function(requests) {
+		$('#requests').empty();
+		for (var i = 1, len = requests.length || 3; i <= len; i++) {
+			$('#requests').append(function() {
+				req = "request" + i;
+				input = "<input id=\"" + req + "\" name=\"" + req + "\" size=\"60\" />";
+
+				if (requests[i-1]) {
+					input += "<input type=\"button\" id=\"delReq" + i + "\" name=\"delReq" + i + "\"datavalue=\"" + requests[i-1].id + "\" value=\"x\" style=\"width:18px\"/>";
+				}
+				return input;
+			});
+
+			if (requests[i-1]) {
+				$('#delReq' + i).click(deleteReqHandler);
+			}
+		};
+
+		$.each(requests, function(idx, value) {
+			$('#request' + (idx+1)).val(requests[idx].request);
+		});
+
+		$('#requests').append("<input value=\"Add\" type=\"button\" id=\"addNewReq\" name=\"addNewReq\"/>");
+		addAddNewReqHandler();
+	}
+
 
 });
 
@@ -342,7 +407,7 @@ label.left {
 
 </head>
 <body>
-<form action="/guide/<%= params[:key] %>/editentry?apikey=1138" method="post" enctype="multipart/form-data">
+<form id="main" method="post" enctype="multipart/form-data">
 	<label for="entry">Selector</label>
 	<select id="entry" name="entry">
 		<% guide_entries_all.each do |entry| %>
@@ -352,7 +417,9 @@ label.left {
 
 	<label for="name">Entry</label>
 	<input id="id" name="id" disabled size="3"/>
-	<input id="name" name="name"/><br/>
+	<input id="name" name="name"/>
+	<input type="button" id="addBtn" value="Add" />
+	<input type="button" id="cancelBtn" value="Cancel New" style="display: none;" /><br/>
 
 	<label for="image">Photo</label>
 	<input id="image" name="image" size="20" /><br/>
@@ -360,19 +427,12 @@ label.left {
 	<label for="location">Location</label>
 	<input id="location" name="location" size="30" /><br/>
 
-	<!-- <label for="datafile">Data File</label>
-	<input type="file" name="datafile"/><br/> -->
-
 	<label for="entrytype">Entry Type</label>
 	<select id="entrytype" name="entrytype">
 		<option value="0">Individual</option>
 		<option value="1">Organization</option>
 		<option value="2">Church Planter</option>
 	</select><br/>
-
-	<label for="contentreadonly">Data (old)</label>
-	<textarea id="contentreadonly" disabled name="dfcontent" rows="6" cols="75"></textarea><br/>
-	<!-- <textarea id="dfcontent" name="dfcontent" rows="6" cols="75"></textarea> -->
 
 	<label for="bio">Bio</label>
 	<textarea id="bio" name="bio" rows="6" cols="60"></textarea><br/>
@@ -384,6 +444,9 @@ label.left {
 	<br/>
 	<input type="checkbox" id="include" name="include">
 	<label for="include" class="left">Include</label><br/>
+
+	<!-- hidden field -->
+	<input type="hidden" id="guidekey" name="guidekey" />
 
 	<br/>
 	<label for="copyToEntry">Copy requests to entry:</label>

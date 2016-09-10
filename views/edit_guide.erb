@@ -97,18 +97,24 @@ $(document).ready(function() {
 		$('#title').val(selectedEntry.title);
 		$('#textLabel').val(selectedEntry.textLabel);
 		$('#image').val(selectedEntry.image);
+
+		// Edit form action url with selected guide
+		$('#main').attr('action', '/v3/guide/' + selectedEntry.id + '?apikey=1138')
 	});
 
 	// if guides exist
-	if (guides.length > 0) {	
+	if (guides.length > 0) {
 		$('#title').val(guides[0].title);
 		$('#textLabel').val(guides[0].textLabel);
 		$('#image').val(guides[0].image);
+		
+		// Edit form action url with selected guide		
+		$('#main').attr('action', '/v3/guide/' + guides[0].id + '?apikey=1138')
 	}
 	
-	$('#submitBtn').click(function() {
-		$('#submitBtn').disable(true)
-	});
+	// $('#submitBtn').click(function() {
+	// 	$('#submitBtn').disable(true)
+	// });
 
 	$('#addBtn').click(function() {
 
@@ -123,7 +129,7 @@ $(document).ready(function() {
 
 		$('#guide_new').focus();
 
-		$('#main').attr('action', '/addguide?apikey=1138')
+		$('#main').attr('action', '/v3/guide?apikey=1138')
 		
 	});
 
@@ -202,7 +208,7 @@ textarea[disabled] {
 
 </head>
 <body>
-<form id="main" action="/editguide?apikey=1138" method="post" enctype="multipart/form-data">
+<form id="main" action="editplaceholder?apikey=1138" method="post" enctype="multipart/form-data">
 	<label for="guide">Guide</label>
 	<select id="guide" name="guide">
 		<% guides_all.each do |guide| %>
