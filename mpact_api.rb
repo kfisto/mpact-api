@@ -93,7 +93,7 @@ helpers do
 	end
 
 	def guide_entries_all
-		@guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,entrytype,location,include') || halt(404)
+		@guide_entries_all ||= Entry.where('"entries"."guideKey" = ?', params[:key]).order('entrytype ASC', 'name ASC').select('id,"guideKey",name,image,bio,data,entrytype,location,include') || halt(404)
 	end
 
 	def guide_entries
@@ -297,33 +297,33 @@ end
 # get '/ops/report' do
 # 	erb :ops_report
 # end
-post '/ops/add' do
-	puts "add " + params[:description]
+# post '/ops/add' do
+# 	puts "add " + params[:description]
 
-	op = Op.create(
-			category: params[:category].to_i,
-			what: params[:what],
-			when: params[:when],
-			where: params[:where],
-			description: params[:description])
+# 	op = Op.create(
+# 			category: params[:category].to_i,
+# 			what: params[:what],
+# 			when: params[:when],
+# 			where: params[:where],
+# 			description: params[:description])
 
-	redirect '/ops/add?apikey=1138&added=' + op.id.to_s + '&cat=' + op.category.to_s
-end
-post '/ops/edit' do
-	puts "edit " + params[:description]
+# 	redirect '/ops/add?apikey=1138&added=' + op.id.to_s + '&cat=' + op.category.to_s
+# end
+# post '/ops/edit' do
+# 	puts "edit " + params[:description]
 
-	id = params[:id]
-	Op.update(
-		id, {
-			:category => params[:category].to_i,
-			:what => params[:what],
-			:when => params[:when],
-			:where => params[:where],
-			:description => params[:description]
-		})
+# 	id = params[:id]
+# 	Op.update(
+# 		id, {
+# 			:category => params[:category].to_i,
+# 			:what => params[:what],
+# 			:when => params[:when],
+# 			:where => params[:where],
+# 			:description => params[:description]
+# 		})
 
-	redirect '/ops/edit?apikey=1138&edited=' + id.to_s
-end
+# 	redirect '/ops/edit?apikey=1138&edited=' + id.to_s
+# end
 get '/ops/:cat' do
 	content_type 'application/json'
 	mission_ops.where('ops.category = ?', params[:cat].to_s).to_json
@@ -351,155 +351,155 @@ get '/entry/:idx' do
 	# return retval
 end
 
-post '/guide/:key/entry' do
+# post '/guide/:key/entry' do
 
-	entry = nil
+# 	entry = nil
 
-	name = params[:name]
-	image = params[:image]
-	# filename = params[:datafile] if !params[:datafile].nil?
-	# content = params[:dfcontent]
+# 	name = params[:name]
+# 	image = params[:image]
+# 	# filename = params[:datafile] if !params[:datafile].nil?
+# 	# content = params[:dfcontent]
 
-	nextid = Entry.last.id + 1
+# 	nextid = Entry.last.id + 1
 
-	puts nextid.to_s
+# 	puts nextid.to_s
 
-	if !name.nil?
-		# puts "do stuff"
-		entry = Entry.create(id: nextid, guideKey: params[:key], name: name, image: image, entrytype: params[:entrytype])
+# 	if !name.nil?
+# 		# puts "do stuff"
+# 		entry = Entry.create(id: nextid, guideKey: params[:key], name: name, image: image, entrytype: params[:entrytype])
 
-		if !image.nil?
-			entry.image = image
-		end
+# 		if !image.nil?
+# 			entry.image = image
+# 		end
 
-		redirect '/guide/' + params[:key] + '/addentry?apikey=1138&added=' + entry.id.to_s + '&et=' + entry.entrytype.to_s
-	else
-		redirect '/guide/' + params[:key] + '/addentry?apikey=1138&error=Error adding new entry.'
-	end
+# 		redirect '/guide/' + params[:key] + '/addentry?apikey=1138&added=' + entry.id.to_s + '&et=' + entry.entrytype.to_s
+# 	else
+# 		redirect '/guide/' + params[:key] + '/addentry?apikey=1138&error=Error adding new entry.'
+# 	end
 
-end
+# end
 
 # get '/guide/:key/editentries' do
 # 	erb :db_form
 # end
 
-post '/guide/:key/editentry' do
+# post '/guide/:key/editentry' do
 
-	id = params[:entry]
+# 	id = params[:entry]
 
-	Entry.update(id, { :image => params[:image], :name => params[:name], :entrytype => params[:entrytype], :bio => params[:bio], :location => params[:location], :include => params[:include] })
+# 	Entry.update(id, { :image => params[:image], :name => params[:name], :entrytype => params[:entrytype], :bio => params[:bio], :location => params[:location], :include => params[:include] })
 
-	reqs_all = params.select { |key,value| key.to_s.match(/^request\d+/) }
+# 	reqs_all = params.select { |key,value| key.to_s.match(/^request\d+/) }
 
-	puts reqs_all
+# 	puts reqs_all
 
-	theEntry = Entry.find_by_id(id)
+# 	theEntry = Entry.find_by_id(id)
 
-	theEntry.requests.delete_all
+# 	theEntry.requests.delete_all
 
-	reqs_all.each_with_index { |item, idx| 
+# 	reqs_all.each_with_index { |item, idx| 
 
-		req = item[1]
-		req.strip
-		if req.length > 0
-			theEntry.requests.create(request: req)
-		end
+# 		req = item[1]
+# 		req.strip
+# 		if req.length > 0
+# 			theEntry.requests.create(request: req)
+# 		end
 
-		# item[1].strip
-		# if item[1].length > 0
-		# 	theEntry.requests.create(request: item)
-		# end
-	}
+# 		# item[1].strip
+# 		# if item[1].length > 0
+# 		# 	theEntry.requests.create(request: item)
+# 		# end
+# 	}
 
-	redirect '/guide/' + params[:key] + '/editentries?apikey=1138&edited=' + id.to_s
-end
+# 	redirect '/guide/' + params[:key] + '/editentries?apikey=1138&edited=' + id.to_s
+# end
 
-post '/deleteguide/:id' do
-	id = params[:id]
-	guide = Guide.find(id)
-	return status 404 if guide.nil?
+# post '/deleteguide/:id' do
+# 	id = params[:id]
+# 	guide = Guide.find(id)
+# 	return status 404 if guide.nil?
 
-	guide.delete
-	status 202
+# 	guide.delete
+# 	status 202
 
-	redirect '/guides/edit?apikey=1138&deleted=' + id.to_s
-end
+# 	redirect '/guides/edit?apikey=1138&deleted=' + id.to_s
+# end
 
 # edit guide
-post '/editguide' do
+# post '/editguide' do
 
-	id = params[:guide]
+# 	id = params[:guide]
 
-	Guide.update(id, { :image => params[:image], :title => params[:title], :textLabel => params[:textLabel]})
+# 	Guide.update(id, { :image => params[:image], :title => params[:title], :textLabel => params[:textLabel]})
 
-	redirect '/guides/edit?apikey=1138&edited=' + id.to_s
-end
+# 	redirect '/guides/edit?apikey=1138&edited=' + id.to_s
+# end
 
-post '/addguide' do
+# post '/addguide' do
 
-	newGuide = Guide.create(
-		key: params[:guide_new],
-		image: params[:image],
-		title: params[:title],
-		textLabel: params[:textLabel])
+# 	newGuide = Guide.create(
+# 		key: params[:guide_new],
+# 		image: params[:image],
+# 		title: params[:title],
+# 		textLabel: params[:textLabel])
 	
-	redirect '/guides/edit?apikey=1138&added=' + newGuide.id.to_s
-end
+# 	redirect '/guides/edit?apikey=1138&added=' + newGuide.id.to_s
+# end
 
-post '/guide/:key/deleteentry/:id' do
-	id = params[:id]
-	entry = Entry.find(id)
-	return status 404 if entry.nil?
+# post '/guide/:key/deleteentry/:id' do
+# 	id = params[:id]
+# 	entry = Entry.find(id)
+# 	return status 404 if entry.nil?
 
-	entry.delete
-	status 202
+# 	entry.delete
+# 	status 202
 
-	redirect '/guide/' + params[:key] + '/editentries?apikey=1138&deleted=' + id.to_s
+# 	redirect '/guide/' + params[:key] + '/editentries?apikey=1138&deleted=' + id.to_s
 
-end
-
-
-delete 'guide/entry/:id' do
-
-	puts params[:_method]
-
-	entry = Entry.find(params[:id])
-	return status 404 if entry.nil?
-	entry.delete
-	status 202
-	"Entry #{id} deleted."
-end
+# end
 
 
-post '/copyrequests/:from/:to' do
-	fromEntryReqs = Request.where('"requests"."entry_id" = ?', params[:from])
+# delete 'guide/entry/:id' do
 
-	toEntry = Entry.find_by_id(params[:to])
+# 	puts params[:_method]
 
-	fromEntryReqs.each do |req|
+# 	entry = Entry.find(params[:id])
+# 	return status 404 if entry.nil?
+# 	entry.delete
+# 	status 202
+# 	"Entry #{id} deleted."
+# end
 
-		lastReq = Request.last
-		nextid = lastReq.nil? ? 1 : lastReq.id + 1
 
-		# req = Request.create(id: nextid, )
-		toEntry.requests.create(request: req.request)
+# post '/copyrequests/:from/:to' do
+# 	fromEntryReqs = Request.where('"requests"."entry_id" = ?', params[:from])
 
-	end
+# 	toEntry = Entry.find_by_id(params[:to])
+
+# 	fromEntryReqs.each do |req|
+
+# 		lastReq = Request.last
+# 		nextid = lastReq.nil? ? 1 : lastReq.id + 1
+
+# 		# req = Request.create(id: nextid, )
+# 		toEntry.requests.create(request: req.request)
+
+# 	end
 	
-	redirect '/guide/' + toEntry.guideKey + '/editentries?apikey=1138&edited=' + params[:to].to_s
-end
+# 	redirect '/guide/' + toEntry.guideKey + '/editentries?apikey=1138&edited=' + params[:to].to_s
+# end
 
-post '/guide/:key/deleterequest/:id' do
-	id = params[:id]
-	request = Request.find(id)
-	return status 404 if request.nil?
+# post '/guide/:key/deleterequest/:id' do
+# 	id = params[:id]
+# 	request = Request.find(id)
+# 	return status 404 if request.nil?
 
-	request.delete
-	status 202
+# 	request.delete
+# 	status 202
 
-	redirect '/guide/' + params[:key] + '/editentries?apikey=1138&deletedreq=' + id.to_s
+# 	redirect '/guide/' + params[:key] + '/editentries?apikey=1138&deletedreq=' + id.to_s
 
-end
+# end
 
 
 
