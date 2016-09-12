@@ -161,7 +161,7 @@ get '/v2/guide/:key/entries' do
 		# 	sorted = guide_entries_all.select('id,"guideKey",name,image,entrytype')
 		# else 
 		# 	puts "return subset"
-			sorted = guide_entries.select('id,"guideKey",name,image,entrytype,bio')
+			sorted = guide_entries.select('id,"guideKey",name,image,entrytype')
 		# end
 
 	end
@@ -344,11 +344,6 @@ get '/entry/:idx' do
 	entry = Entry.find_by_id(params[:idx])
 	
 	return entry.to_json(:include => :requests)
-
-	# retval["requests"] = reqs.to_json
-
-
-	# return retval
 end
 
 # post '/guide/:key/entry' do
