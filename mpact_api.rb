@@ -607,7 +607,7 @@ get '/v3/guide/:key/entries' do
 	if key == "refuge"
 		sorted = guide_entries.sort_by &:id
 	else
-		sorted = guide_entries.select('id,"guideKey",name,image,entrytype,bio')
+		sorted = guide_entries.select('id,"guideKey",name,image,entrytype,bio,location')
 	end
 
 	sorted.to_json
