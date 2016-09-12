@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>mpact-api readme</title>
+
+	<style>
+	html,body {
+		font-family: Helvetica,Arial,sans-serif;
+		font-size: .9em;
+	}
+	th {
+		border-bottom: 1px solid gray;
+		text-align: left;
+	}
+	tr:nth-child(even) {
+		background-color: #eee;
+	}
+	th,td {
+		padding: 5px;
+	}
+
+
+	/* jira */
+	h3 {
+		color: orange;
+		font-size: 1.75em;
+		margin-top: 1.25em;
+		margin-bottom: 0em;
+	}
+
+	h4 {
+		margin: 0em;
+		padding: 0em;
+		border-bottom: 2px solid white;
+	}
+
+	h6 {
+		font-size: 1.1em;
+		color: #99a;
+		margin: 0.5em 0em 0.25em 0em;
+	}
+
+	.methods {
+		background-color: #eef;
+		padding: 1em;
+	}
+
+	.optional {
+		font-weight: normal;
+		opacity: 0.75;
+	}
+
+	table {
+		margin-bottom: 0.5em;
+	}
+
+	th {
+		text-align: left;
+		font-weight: normal;
+		color: black;
+		border-bottom: 1px solid black;
+		padding: 3px 6px;
+	}
+
+	td {
+		padding: 3px 6px;
+		vertical-align: top;
+		background-color: #f6f6ff;
+		font-size: 0.85em;
+	}
+
+	td p {
+		margin: 0px;
+	}
+
+	</style>
+
+	<script>
+	function toggle(id) {
+		var el = document.getElementById(id);
+		el.style.display = (el.style.display != 'none' ? 'none' : '' );
+		document.getElementById("link-" + id).innerHTML = (el.style.display == 'none' ? 'expand' : 'collapse' );
+	}
+	</script>
+
+</head>
+<body>
+
+<h1>mpact-api</h1>
+
+<p>This is the database backend for the mpact ios app.</p>
+
+<h2>endpoints</h2>
+
+<ul>
+<!-- <li>guides [GET]</li>
+<li>guides/edit [GET]</li> -->
+
+<li>v2/guide/{key}/entrieswithreqs [GET]</li>
+<li>guide/{key}/entrieswithreqs [GET]</li>
+
+<li>guide/{key}/entries/report [GET]</li>
+<li>guide/{key}/entry/{index}/requests [GET]</li>
+<li>guide/{key}/entries/today/random [GET]</li>
+
+<li>guide/{key}/addentry [GET]</li>
+<li>guide/{key}/entry [POST]</li>
+
+<li>entry/{index} [GET]</li>
+
+
+<li>guide/{key}/editentry [POST]</li>
+
+<li>deleteguide/{index} [POST]</li>
+
+<li>editguide [POST]</li>
+<li>addguide [POST]</li>
+
+<li>guide/{key}/deleteentry/{index} [POST]</li>
+
+<li>guide/entry/{index} [DELETE]</li>
+
+<!-- entry requests -->
+<li>copyrequests/{from}/{to} [POST]</li>
+<li>guide/{key}/deleterequest/{index} [POST]</li>
+
+</ul>
+
+<h2>v3 endpoints</h2>
+
+<p>Guides</p>
+<ul>
+<!-- version 3 -->
+<li><a href="#idx1001">/v3/guides [GET]</a>
+<ul><li><a href="#idx1001ui">/v3/guides/edit [GET]</a></li></ul>
+</li>
+<li><a href="#idx1002">/v3/guide [POST]</a>
+<ul><li><a href="#idx1003">/v3/guide/{id} [<a href="#idx1003a">GET</a>, <a href="#idx1003b">POST</a>]</a></li></ul>
+</li>
+</ul>
+
+
+<p>Entries</p>
+<ul>
+<li><a href="#idx1005">/v3/guide/{key}/entries [GET]</a>
+<ul>
+	<li><a href="#idx1005ui">/v3/guide/{key}/entries/edit [GET]</a></li>
+	<li><a href="#idx1006">/v3/guide/{key}/entries/today [GET]</a></li>
+</ul>
+</li>
+<li><a href="#idx1007">/v3/guide/{key}/entry [POST]</a>
+<ul>
+	<li><a href="#idx1008">/v3/guide/{key}/entry/{entryid}</a> [<a href="#idx1008a">GET</a>,<a href="#idx1008b">POST</a>,<a href="#idx1008c">DELETE</a>]</li>
+</ul>
+</ul>
+
+
+
+
+<p>Opportunities</p>
+<ul>
+<li><a href="#idx1010">/v3/ops [GET]</a>
+<ul><li><a href="#idx1010ui">/v3/ops/edit [GET]</a></li></ul>
+</li>
+<li><a href="#idx1011">/v3/op [POST]</a>
+<ul><li><a href="#idx1012">/v3/op/{id} [<a href="#idx1012a">GET</a>, <a href="#idx1012b">POST</a>]</a></li></ul>
+</li>
+<!-- <li>/v3/ops/report [GET]</li> -->
+<!-- <li>/v3/ops/{category} [GET]</li> -->
+
+</ul>
+
+
+
+
+
+
+
+
+
+<h2>Docs</h2>
+
+<!-- guides -->
+<h3 id="idx1001">/v3/guides</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method">
+		<h4>GET</h4>
+		<p>Retrieves all guides.</p>
+	</div>
+</div>
+
+<h3 id="idx1001ui">/v3/guides/edit</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method">
+		<h4>GET</h4>
+		<p>Presents UI to edit guide entries.</p>
+	</div>
+</div>
+
+
+<h3 id="idx1002">/v3/guide</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method">
+		<h4>POST</h4>
+		<p>Creates a guide from JSON representation</p>
+	</div>
+</div>
+
+<h3 id="idx1003">/v3/guide/{id}</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method" id="idx1003a">
+		<h4>GET</h4>
+		<p>Returns guide for given id.</p>
+		<p><em>available response representations:</em></p>
+		<ul>
+			<li>
+				<div>200 - application/json</div>
+			</li>
+			<li><div>404 [<a onclick="toggle('t1003a'); return false;" href="#"><em><span id="link-t1003a">expand</span></em></a>]
+			</div><div class="toggle" id="t1003a" style="display: none;"><p>Returned if there is no guide with the given key.</p></div></li></ul>
+	</div>
+	<div class="method" id="idx1003b">
+		<h4>POST</h4>
+		<p>Edits a guide from JSON representation</p>
+	</div>
+</div>
+
+
+
+<h3 id="idx1005">/v3/guide/{key}/entries</h3>
+<h6>resource-wide template parameters</h6>
+<table>
+	<tbody>
+		<tr>
+			<th>parameter</th>
+			<th>value</th>
+			<th>description</th>
+		</tr>
+		<tr>
+			<td><p><strong>key</strong></p></td>
+			<td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td>
+			<td><p>a String containing the guide key</p></td>
+		</tr>
+	</tbody>
+</table>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method" id="idx1005a">
+		<h4>GET</h4>
+		<p>Returns entries for specified guide.</p>
+		<p><em>available response representations:</em></p>
+		<ul>
+			<li>
+				<div>200 - application/json</div>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<h3 id="idx1005ui">/v3/guide/{key}/entries/edit</h3>
+<h6>resource-wide template parameters</h6>
+<table>
+	<tbody>
+		<tr>
+			<th>parameter</th>
+			<th>value</th>
+			<th>description</th>
+		</tr>
+		<tr>
+			<td><p><strong>key</strong></p></td>
+			<td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td>
+			<td><p>a String containing the guide key</p></td>
+		</tr>
+	</tbody>
+</table>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method">
+		<h4>GET</h4>
+		<p>Presents UI to edit entries for specified guide.</p>
+	</div>
+</div>
+
+<h3 id="idx1006">/v3/guide/{key}/entries/today</h3>
+<h6>resource-wide template parameters</h6>
+<table>
+	<tbody>
+		<tr>
+			<th>parameter</th>
+			<th>value</th>
+			<th>description</th>
+		</tr>
+		<tr>
+			<td><p><strong>key</strong></p></td>
+			<td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td>
+			<td><p>a String containing the guide key</p></td>
+		</tr>
+	</tbody>
+</table>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method" id="idx1006a">
+		<h4>GET</h4>
+		<p>Returns today's entry for specified guide.</p>
+		<p><em>available response representations:</em></p>
+		<ul>
+			<li>
+				<div>200 - application/json</div>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<h3 id="idx1007">/v3/guide/{key}/entry</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method">
+		<h4>POST</h4>
+		<p>Creates an entry from JSON representation</p>
+	</div>
+</div>
+
+<h3 id="idx1008">/v3/guide/{key}/entry/{entryid}</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method" id="idx1008a">
+		<h4>GET</h4>
+		<p>Returns the entry for given id and guide.</p>
+		<p><em>available response representations:</em></p>
+		<ul>
+			<li>
+				<div>200 - application/json</div>
+			</li>
+			<li><div>404 [<a onclick="toggle('t1008a'); return false;" href="#"><em><span id="link-t1008a">expand</span></em></a>]
+			</div><div class="toggle" id="t1008a" style="display: none;"><p>Returned if there is no entry with the given id.</p></div></li></ul>
+	</div>
+	<div class="method" id="idx1008b">
+		<h4>POST</h4>
+		<p>Edits an entry from JSON representation</p>
+	</div>
+	<div class="method" id="idx1008C">
+		<h4>DELETE</h4>
+		<p>Deletes entry by entryid</p>
+	</div>
+</div>
+
+
+<!-- ops -->
+<h3 id="idx1010">/v3/ops</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method">
+		<h4>GET</h4>
+		<h6>/v3/ops<span class="optional">?category</span></h6>
+		<p>Retrieves all mission opportunities.</p>
+		<h6>request query parameters</h6>
+		<table>
+			<tbody>
+				<tr><th>parameter</th><th>value</th><th>description</th></tr>
+				<tr>
+					<td><p><strong>category</strong></p></td>
+					<td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#int">int</a></em></p></td>
+					<td><p>a String containing the category id</p></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<h3 id="idx1010ui">/v3/ops/edit</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method">
+		<h4>GET</h4>
+		<p>Presents UI to edit mission opportunities entries.</p>
+	</div>
+</div>
+
+<h3 id="idx1011">/v3/op</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method">
+		<h4>POST</h4>
+		<p>Creates a mission opportunity from JSON representation</p>
+	</div>
+</div>
+
+<h3 id="idx1012">/v3/op/{id}</h3>
+<h6>Methods</h6>
+<div class="methods">
+	<div class="method" id="idx1012a">
+		<h4>GET</h4>
+		<p>Returns opportunity for given id.</p>
+		<p><em>available response representations:</em></p>
+		<ul>
+			<li>
+				<div>200 - application/json</div>
+			</li>
+			<li><div>404 [<a onclick="toggle('t1012a'); return false;" href="#"><em><span id="link-t1012a">expand</span></em></a>]
+			</div><div class="toggle" id="t1012a" style="display: none;"><p>Returned if there is no opportunity with the given key.</p></div></li></ul>
+	</div>
+	<div class="method" id="idx1012b">
+		<h4>POST</h4>
+		<p>Edits a guide from JSON representation</p>
+	</div>
+</div>
+
+</body>
+</html>

@@ -634,9 +634,9 @@ end
 get '/v3/entry/:idx' do
 	content_type 'application/json'
 
-	theEntry = Entry.find_by_id(params[:idx])
+	entry = Entry.find_by_id(params[:idx])
 
-	theEntry.to_json
+	return entry.to_json(:include => :requests)
 end
 
 post '/v3/entry' do
