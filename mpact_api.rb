@@ -610,7 +610,7 @@ get '/v3/guide/:key/entries' do
 		sorted = guide_entries.select('id,"guideKey",name,image,entrytype,bio,location')
 	end
 
-	sorted.to_json
+	sorted.to_json(:include => :requests)
 end
 
 # get a single entry for "today" functionality (per guide)
